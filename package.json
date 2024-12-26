@@ -9,16 +9,21 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@measured/puck": "^0.17.1",
+    "@plasmicapp/loader-nextjs": "^1.0.407",
+    "formidable": "^3.5.2",
+    "next": "14.2.18",
     "react": "^18",
     "react-dom": "^18",
-    "next": "14.2.18"
+    "react-dropzone": "^14.3.5"
   },
   "devDependencies": {
-    "typescript": "^5",
+    "@types/formidable": "^3.4.5",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "eslint": "^8",
-    "eslint-config-next": "14.2.18"
+    "eslint-config-next": "14.2.18",
+    "typescript": "^5"
   }
 }
