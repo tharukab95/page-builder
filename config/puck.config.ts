@@ -134,7 +134,6 @@ export const components = {
       id: {
         type: "text" as const,
         defaultValue: "iterator",
-        required: true,
       },
       apiEndpoint: { type: "text" as const },
       arrayKey: { type: "text" as const },

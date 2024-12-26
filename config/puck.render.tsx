@@ -6,11 +6,22 @@ import {
   TextBlock,
   ImageBlock,
   ButtonBlock,
-  Iterator,
+  IteratorRenderer,
 } from "../components/blocks";
+import React from "react";
+
+// Create a non-async wrapper component
+const IteratorRenderWrapper = (props: any) => {
+  // Use React Suspense and dynamic import for async component
+  return (
+    <React.Suspense fallback={<div>Loading...</div>}>
+      <IteratorRenderer {...props} />
+    </React.Suspense>
+  );
+};
 
 // Client config with render implementations
-export const clientConfig: UserConfig = {
+export const rendererConfig: UserConfig = {
   components: {
     HeadingBlock: {
       ...components.HeadingBlock,
@@ -29,7 +40,7 @@ export const clientConfig: UserConfig = {
       render: ButtonBlock,
     },
     Iterator: {
-      render: ({ puck, ...props }) => <Iterator puck={puck} {...props} />,
+      render: IteratorRenderWrapper,
       fields: {
         id: {
           type: "text" as const,
