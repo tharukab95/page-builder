@@ -29,7 +29,7 @@ export default function PlasmicLoaderPage(props: {
       pageRoute={pageMeta.path}
       pageParams={pageMeta.params}
       pageQuery={router.query}
-    >
+    >     
       <PlasmicComponent component={pageMeta.displayName} />
     </PlasmicRootProvider>
   );

@@ -43,6 +43,11 @@ export const clientConfig: UserConfig = {
           type: "text" as const,
           label: "Array Key",
         },
+        items: {
+          type: "custom" as const,
+          label: "Items",
+          render: () => <></>,
+        },
         itemsPerRow: {
           type: "select" as const,
           label: "Items Per Row",
@@ -58,6 +63,7 @@ export const clientConfig: UserConfig = {
         id: "iterator",
         apiEndpoint: "/api/items",
         itemsPerRow: 3 as 1 | 2 | 3 | 4,
+        items: [],
       },
     },
   },

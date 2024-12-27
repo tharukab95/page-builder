@@ -10,7 +10,8 @@ import React, {
   createContext,
   useContext,
 } from "react";
-import { clientConfig } from "../../config/puck.client";
+// import { clientConfig } from "../../config/puck.client";
+import { ButtonBlock, HeadingBlock, ImageBlock, TextBlock } from ".";
 
 interface IteratorProps {
   id: string;
@@ -71,7 +72,7 @@ const Iterator = ({
 
       const items = arrayKey ? json[arrayKey] : json;
       if (!Array.isArray(items)) throw new Error("Data is not an array");
-      console.log("Fetched data:", items);
+      // console.log("Fetched data:", items);
       setFetchState({
         items: items,
         loading: false,
@@ -95,25 +96,45 @@ const Iterator = ({
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
-  console.log("id", id);
+  // console.log("id", id);
 
-  console.log(
-    "appState.data.zones?.[`${id}:iterator-item`]",
-    appState.data.zones?.[`${id}:iterator-item`]
-  );
+  // console.log(
+  //   "appState.data.zones?.[`${id}:iterator-item`]",
+  //   appState.data.zones?.[`${id}:iterator-item`]
+  // );
 
-  console.log("appState.data.zones", appState.data.zones);
+  // console.log("appState.data.zones", appState.data.zones);
 
   const iteratorItems = appState.data.zones?.[`${id}:iterator-item`] || [];
 
-  console.log("iteratorItems", iteratorItems);
+  // console.log("iteratorItems", iteratorItems);
 
-  const renderComponent = (componentData: any) => {
-    const Component =
-      clientConfig.components[
-        componentData.type as keyof typeof clientConfig.components
-      ].render;
-    return <Component {...componentData.props} />;
+  const renderComponent = (
+    componentData: any,
+    index: number,
+    compIndex: number
+  ) => {
+    const components = {
+      HeadingBlock,
+      TextBlock,
+      ImageBlock,
+      ButtonBlock,
+    };
+
+    const Component = components[componentData.type as keyof typeof components];
+    if (!Component) {
+      console.warn(`Component ${componentData.type} not found`);
+      return null;
+    }
+
+    const { props: componentProps } = componentData;
+    return (
+      <Component
+        key={`${index}-${compIndex}`}
+        {...componentProps}
+        data={items[index]}
+      />
+    );
   };
 
   return (
@@ -123,9 +144,9 @@ const Iterator = ({
         gridTemplateColumns: `repeat(${itemsPerRow}, 1fr)`,
         gap: "1rem",
         padding: "1rem",
-        border: "2px dashed #4a90e2",
-        borderRadius: "4px",
-        background: "rgba(74, 144, 226, 0.1)",
+        // border: "2px dashed #4a90e2",
+        // borderRadius: "4px",
+        // background: "rgba(74, 144, 226, 0.1)",
         position: "relative",
       }}
     >
@@ -137,11 +158,8 @@ const Iterator = ({
             </DropZone>
           ) : (
             // Clone the children from the first item for other items
-            iteratorItems.map((componentData) =>
-              renderComponent({
-                ...componentData,
-                props: { ...componentData.props, data: item },
-              })
+            iteratorItems.map((componentData, compIndex) =>
+              renderComponent(componentData, index, compIndex)
             )
           )}
         </div>

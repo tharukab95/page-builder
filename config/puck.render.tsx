@@ -6,19 +6,12 @@ import {
   TextBlock,
   ImageBlock,
   ButtonBlock,
-  IteratorRenderer,
 } from "../components/blocks";
+import IteratorRenderer from "../components/blocks/IteratorRenderer";
 import React from "react";
 
-// Create a non-async wrapper component
-const IteratorRenderWrapper = (props: any) => {
-  // Use React Suspense and dynamic import for async component
-  return (
-    <React.Suspense fallback={<div>Loading...</div>}>
-      <IteratorRenderer {...props} />
-    </React.Suspense>
-  );
-};
+// Add base URL constant
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
 
 // Client config with render implementations
 export const rendererConfig: UserConfig = {
@@ -40,7 +33,30 @@ export const rendererConfig: UserConfig = {
       render: ButtonBlock,
     },
     Iterator: {
-      render: IteratorRenderWrapper,
+      render: IteratorRenderer,
+      resolveData: async ({ props }) => {
+        // Add base URL to API endpoints
+        const response = await fetch(`${BASE_URL}${props?.apiEndpoint}`);
+        if (!response.ok) throw new Error("Failed to fetch items");
+        const json = await response.json();
+        const items = props?.arrayKey ? json[props?.arrayKey] : json;
+
+        const zoneChildrenResponse = await fetch(
+          `${BASE_URL}/api/zoneChildren?id=${props?.id}`
+        );
+        const zoneChildrenJson = await zoneChildrenResponse.json();
+        console.log("zoneChildrenJson", zoneChildrenJson);
+        const zoneChildren = Array.isArray(zoneChildrenJson)
+          ? zoneChildrenJson
+          : [];
+        return {
+          props: {
+            ...props,
+            items: items || [],
+            children: zoneChildren || [],
+          },
+        };
+      },
       fields: {
         id: {
           type: "text" as const,
@@ -64,11 +80,23 @@ export const rendererConfig: UserConfig = {
             { label: "4", value: 4 },
           ],
         },
+        items: {
+          type: "custom" as const,
+          label: "Items",
+          render: () => <></>,
+        },
+        children: {
+          type: "custom" as const,
+          label: "Children",
+          render: () => <></>,
+        },
       },
       defaultProps: {
         id: "iterator",
         apiEndpoint: "/api/items",
         itemsPerRow: 3 as 1 | 2 | 3 | 4,
+        items: [],
+        children: [],
       },
     },
   },

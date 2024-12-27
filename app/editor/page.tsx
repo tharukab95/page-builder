@@ -1,6 +1,8 @@
+"use client";
+
 import { Puck } from "@measured/puck";
 import { useEffect, useState } from "react";
-import { clientConfig } from "../config/puck.client";
+import { clientConfig } from "../../config/puck.client";
 import "@measured/puck/puck.css";
 
 export default function Editor() {
@@ -35,13 +37,15 @@ export default function Editor() {
           setData(data);
         }}
       >
-        <div style={{ 
-          display: "grid", 
-          gridTemplateColumns: "250px 1fr 300px",
-          height: "100%",
-          gap: "1px",
-          background: "#f0f0f0"
-        }}>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "250px 1fr 300px",
+            height: "100%",
+            gap: "1px",
+            background: "#f0f0f0",
+          }}
+        >
           {/* Left sidebar - Component list */}
           <div style={{ background: "#fff", padding: "16px" }}>
             <h3 className="text-lg font-bold mb-4">Components</h3>
@@ -49,7 +53,9 @@ export default function Editor() {
           </div>
 
           {/* Middle - Preview area */}
-          <div style={{ background: "#fff", padding: "16px", overflow: "auto" }}>
+          <div
+            style={{ background: "#fff", padding: "16px", overflow: "auto" }}
+          >
             <Puck.Preview />
           </div>
 
@@ -62,4 +68,4 @@ export default function Editor() {
       </Puck>
     </div>
   );
-} 
+}

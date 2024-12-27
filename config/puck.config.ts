@@ -11,6 +11,7 @@ export type ComponentProps = {
   };
   TextBlock: {
     content: string;
+    data?: any;
     dataKey?: string;
   };
   ImageBlock: {
@@ -18,6 +19,7 @@ export type ComponentProps = {
     alt: string;
     width?: number;
     height?: number;
+    data?: any;
     dataKey?: string;
   };
   ButtonBlock: {
@@ -31,7 +33,8 @@ export type ComponentProps = {
     apiEndpoint: string;
     arrayKey?: string;
     itemsPerRow: 1 | 2 | 3 | 4;
-    children?: React.ReactNode;
+    items: any[];
+    children?: any[];
   };
 };
 

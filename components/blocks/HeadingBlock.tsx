@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-"use client";
 
 interface HeadingBlockProps {
   title?: string;
@@ -8,7 +7,12 @@ interface HeadingBlockProps {
   dataKey?: string;
 }
 
-const HeadingBlock = ({ title, size = "medium", data, dataKey }: HeadingBlockProps) => {
+const HeadingBlock = ({
+  title,
+  size = "medium",
+  data,
+  dataKey,
+}: HeadingBlockProps) => {
   const sizes = {
     small: "text-xl",
     medium: "text-2xl",
