@@ -1,3 +1,6 @@
+// This file should be identical to app/view/page.tsx
+// It handles dynamic routes for all pages except the home page
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Render, resolveAllData } from "@measured/puck";
 import { rendererConfig } from "../../config/puck.render";
@@ -6,7 +9,7 @@ import fs from "fs";
 import path from "path";
 
 interface PageProps {
-  params: { slug?: string[] };
+  params: { slug: string[] };
 }
 
 export default async function ViewPage({ params }: PageProps) {
@@ -38,6 +41,6 @@ export async function generateStaticParams() {
   const pagesData = JSON.parse(fs.readFileSync(pagesFile, "utf8"));
 
   return pagesData.pages.map((page: any) => ({
-    slug: page.path.split("/").filter(Boolean),
+    slug: page.path === "/" ? [] : page.path.split("/").filter(Boolean),
   }));
 }

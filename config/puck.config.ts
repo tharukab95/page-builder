@@ -103,7 +103,7 @@ export const components = {
       },
     },
     defaultProps: {
-      src: "https://via.placeholder.com/400x300",
+      src: "https://archive.org/download/placeholder-image/placeholder-image.jpg",
       alt: "Placeholder image",
       width: 400,
       height: 300,
