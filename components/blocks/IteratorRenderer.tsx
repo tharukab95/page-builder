@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { HeadingBlock, TextBlock, ImageBlock, ButtonBlock } from "./";
+import Link from "next/link";
+import { HeadingBlock, TextBlock, ImageBlock, ButtonBlock } from ".";
 
 interface IteratorRenderProps {
   id: string;
@@ -14,6 +15,8 @@ interface IteratorRenderProps {
   puck?: {
     renderDropZone: (props: { zone: string }) => React.ReactNode;
   };
+  navigatePath?: string;
+  slugField?: string;
 }
 
 export default function IteratorRenderer({
@@ -24,10 +27,19 @@ export default function IteratorRenderer({
   items = [],
   children = [],
   puck,
+  navigatePath,
+  slugField,
 }: IteratorRenderProps) {
-  console.log("renderer-items", items);
-
-  console.log("${id}:iterator-item", `${id}:iterator-item`);
+  console.log("IteratorRenderer received props:", {
+    id,
+    apiEndpoint,
+    arrayKey,
+    itemsPerRow,
+    items,
+    children,
+    navigatePath,
+    slugField,
+  });
 
   // const iteratorItems = appState.data.zones?.[`${id}:iterator-item`] || [];
   const iteratorItems = [
@@ -93,13 +105,25 @@ export default function IteratorRenderer({
         position: "relative",
       }}
     >
-      {items?.map((item: any, index: number) => (
-        <div key={index}>
-          {children?.map((componentData: any, compIndex: number) =>
-            renderComponent(componentData, index, compIndex)
-          )}
-        </div>
-      ))}
+      {items?.map((item: any, index: number) => {
+        console.log(`Renderer Item ${index}:`, item);
+        console.log(
+          `Renderer Item[${slugField}]:`,
+          item[slugField as keyof typeof item]
+        );
+
+        return (
+          <div key={index}>
+            <Link
+              href={`${navigatePath}/${item[slugField as keyof typeof item]}`}
+            >
+              {children?.map((componentData: any, compIndex: number) =>
+                renderComponent(componentData, index, compIndex)
+              )}
+            </Link>
+          </div>
+        );
+      })}
     </div>
   );
 }

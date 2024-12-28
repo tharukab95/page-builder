@@ -35,27 +35,48 @@ export const rendererConfig: UserConfig = {
     Iterator: {
       render: IteratorRenderer,
       resolveData: async ({ props }) => {
-        // Add base URL to API endpoints
-        const response = await fetch(`${BASE_URL}${props?.apiEndpoint}`);
-        if (!response.ok) throw new Error("Failed to fetch items");
-        const json = await response.json();
-        const items = props?.arrayKey ? json[props?.arrayKey] : json;
+        try {
+          // Add base URL to API endpoints and disable cache
+          const response = await fetch(`${BASE_URL}${props?.apiEndpoint}`, {
+            cache: "no-store", // Disable cache
+            next: { revalidate: 0 }, // Disable revalidation
+          });
 
-        const zoneChildrenResponse = await fetch(
-          `${BASE_URL}/api/zoneChildren?id=${props?.id}`
-        );
-        const zoneChildrenJson = await zoneChildrenResponse.json();
-        console.log("zoneChildrenJson", zoneChildrenJson);
-        const zoneChildren = Array.isArray(zoneChildrenJson)
-          ? zoneChildrenJson
-          : [];
-        return {
-          props: {
-            ...props,
-            items: items || [],
-            children: zoneChildren || [],
-          },
-        };
+          if (!response.ok) throw new Error("Failed to fetch items");
+
+          const data = await response.json();
+          console.log("Raw API response:", data);
+
+          const items = props?.arrayKey ? data[props?.arrayKey] : data;
+          console.log("Processed items before return:", items);
+
+          // Get zone children with cache disabled
+          const zoneChildrenResponse = await fetch(
+            `${BASE_URL}/api/zoneChildren?id=${props?.id}`,
+            {
+              cache: "no-store",
+              next: { revalidate: 0 },
+            }
+          );
+          const zoneChildrenJson = await zoneChildrenResponse.json();
+
+          return {
+            props: {
+              ...props,
+              items: items,
+              children: Array.isArray(zoneChildrenJson) ? zoneChildrenJson : [],
+            },
+          };
+        } catch (error) {
+          console.error("Error in resolveData:", error);
+          return {
+            props: {
+              ...props,
+              items: [],
+              children: [],
+            },
+          };
+        }
       },
       fields: {
         id: {
@@ -90,6 +111,14 @@ export const rendererConfig: UserConfig = {
           label: "Children",
           render: () => <></>,
         },
+        navigatePath: {
+          type: "text" as const,
+          label: "Navigate Path",
+        },
+        slugField: {
+          type: "text" as const,
+          label: "Slug Field",
+        },
       },
       defaultProps: {
         id: "iterator",
@@ -97,6 +126,8 @@ export const rendererConfig: UserConfig = {
         itemsPerRow: 3 as 1 | 2 | 3 | 4,
         items: [],
         children: [],
+        navigatePath: "/product-details",
+        slugField: "id",
       },
     },
   },

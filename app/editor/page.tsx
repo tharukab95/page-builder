@@ -7,10 +7,18 @@ import { useEffect, useState } from "react";
 import { clientConfig } from "../../config/puck.client";
 import "@measured/puck/puck.css";
 
+interface DynamicPageConfig {
+  apiEndpoint: string;
+  arrayKey: string;
+  idKey: string;
+}
+
 interface Page {
   path: string;
   title: string;
   data: any;
+  isDynamic?: boolean;
+  dynamicConfig?: DynamicPageConfig;
 }
 
 export default function Editor() {
@@ -57,16 +65,26 @@ export default function Editor() {
     if (pageData) {
       setCurrentPage(newPath);
       setData(pageData.data);
+      // Reset key to force re-render of Puck editor
       setKey((k) => k + 1);
     }
   };
 
   const savePageData = async (pageData: Page) => {
     try {
-      await fetch("/api/pages", {
+      const response = await fetch("/api/pages", {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(pageData),
       });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || response.statusText);
+      }
+
       await fetchPages();
     } catch (error) {
       console.error("Failed to save page:", error);
@@ -75,38 +93,115 @@ export default function Editor() {
   };
 
   const createNewPage = async () => {
-    const path = window.prompt("Enter page path (e.g., /about):");
-    if (!path) return;
-
-    const title = window.prompt("Enter page title:", "New Page");
-    if (!title) return;
-
-    const emptyData = { content: [], root: {}, zones: {} };
-    const newPath = path.startsWith("/") ? path : `/${path}`;
-
-    // Set empty state first
-    setData(emptyData);
-    setCurrentPage(newPath);
-
-    // Then save to API
-    const newPage = {
-      path: newPath,
-      title,
-      data: emptyData,
-    };
-
     try {
-      await savePageData(newPage);
-    } catch (_) {
-      alert("Failed to create page");
+      console.log("Starting createNewPage..."); // Debug log
+
+      const path = window.prompt(
+        "Enter page path (e.g., /about or /product-details):"
+      );
+      console.log("Entered path:", path); // Debug log
+      if (!path) {
+        console.log("Path creation cancelled"); // Debug log
+        return;
+      }
+
+      const title = window.prompt("Enter page title:", "New Page");
+      console.log("Entered title:", title); // Debug log
+      if (!title) {
+        console.log("Title creation cancelled"); // Debug log
+        return;
+      }
+
+      const isDynamic = window.confirm("Is this a dynamic page template?");
+      console.log("Is dynamic page:", isDynamic); // Debug log
+
+      let dynamicConfig: DynamicPageConfig | undefined;
+
+      if (isDynamic) {
+        const apiEndpoint = window.prompt(
+          "Enter API endpoint (e.g., /api/products):"
+        );
+        console.log("Entered API endpoint:", apiEndpoint); // Debug log
+
+        const arrayKey =
+          window.prompt("Enter array key from API response:") ?? "";
+        console.log("Entered array key:", arrayKey); // Debug log
+
+        const idKey = window.prompt(
+          "Enter ID field key from items (e.g., id, slug):"
+        );
+        console.log("Entered ID key:", idKey); // Debug log
+
+        // Only check if apiEndpoint and idKey are provided, arrayKey can be empty
+        if (apiEndpoint === null || idKey === null) {
+          console.log("Dynamic config creation cancelled"); // Debug log
+          return;
+        }
+
+        dynamicConfig = {
+          apiEndpoint,
+          arrayKey: arrayKey, // Use empty string if no array key is needed
+          idKey,
+        };
+      }
+
+      const emptyData = { content: [], root: {}, zones: {} };
+      const newPath = path.startsWith("/") ? path : `/${path}`;
+
+      const newPage = {
+        path: newPath,
+        title,
+        data: emptyData,
+        isDynamic: Boolean(isDynamic),
+        dynamicConfig,
+      };
+
+      console.log("Attempting to create new page with data:", newPage); // Debug log
+
+      try {
+        const response = await fetch("/api/pages", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(newPage),
+        });
+
+        console.log("API Response status:", response.status); // Debug log
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error("API Error response:", errorData); // Debug log
+          throw new Error(errorData.error || response.statusText);
+        }
+
+        const result = await response.json();
+        console.log("API Success response:", result); // Debug log
+
+        // Update local state
+        await fetchPages(); // Refresh the pages list
+        setCurrentPage(newPath);
+        setData(emptyData);
+        setKey((k) => k + 1); // Force re-render of Puck editor
+
+        alert("Page created successfully!");
+      } catch (error: any) {
+        console.error("Failed to create page:", error);
+        alert(`Failed to create page: ${error.message}`);
+        return;
+      }
+    } catch (error: any) {
+      console.error("Error in createNewPage:", error);
+      alert(`Error creating page: ${error.message}`);
     }
   };
 
   const savePage = async () => {
     try {
+      const existingPage = pages.find((p) => p.path === currentPage);
       const pageTitle = window.prompt(
         "Enter page title:",
-        pages.find((p) => p.path === currentPage)?.title || "New Page"
+        existingPage?.title || "New Page"
       );
 
       if (!pageTitle) return;
@@ -115,6 +210,9 @@ export default function Editor() {
         path: currentPage,
         title: pageTitle,
         data: data,
+        // Preserve dynamic page properties
+        isDynamic: existingPage?.isDynamic,
+        dynamicConfig: existingPage?.dynamicConfig,
       };
 
       await savePageData(pageData);
@@ -148,7 +246,7 @@ export default function Editor() {
         >
           {pages.map((page) => (
             <option key={page.path} value={page.path}>
-              {page.title} ({page.path})
+              {page.title} ({page.path}){page.isDynamic ? " [Dynamic]" : ""}
             </option>
           ))}
         </select>

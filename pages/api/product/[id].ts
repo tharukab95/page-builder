@@ -1,7 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
-  // Mock data with id as a property
+  const { id } = req.query;
+
+  // Mock data with id as a property (in production, this would be a DB query)
   const items = [
     {
       id: "1",
@@ -29,8 +31,11 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     },
   ];
 
-  // Log the items to verify the structure
-  console.log("API sending items with IDs:", items);
+  const product = items.find((item) => item.id === id);
 
-  res.status(200).json(items);
+  if (!product) {
+    return res.status(404).json({ error: "Product not found" });
+  }
+
+  res.status(200).json(product);
 }

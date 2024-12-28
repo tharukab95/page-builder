@@ -12,12 +12,15 @@ import React, {
 } from "react";
 // import { clientConfig } from "../../config/puck.client";
 import { ButtonBlock, HeadingBlock, ImageBlock, TextBlock } from ".";
+import Link from "next/link";
 
 interface IteratorProps {
   id: string;
   apiEndpoint?: string;
   arrayKey?: string;
   itemsPerRow?: 1 | 2 | 3 | 4;
+  navigatePath?: string;
+  slugField?: string;
   allow?: string[];
   puck?: {
     renderDropZone: (props: {
@@ -49,6 +52,8 @@ const Iterator = ({
   apiEndpoint = "/api/items",
   arrayKey,
   itemsPerRow = 3,
+  navigatePath,
+  slugField,
 }: IteratorProps) => {
   const { appState } = usePuck();
 
@@ -62,17 +67,19 @@ const Iterator = ({
   const fetchItems = useCallback(async () => {
     try {
       setFetchState((prev) => ({ ...prev, loading: true }));
-      const response = await fetch(apiEndpoint);
+      const response = await fetch(apiEndpoint, {
+        cache: "no-store",
+        next: { revalidate: 0 },
+      });
 
       if (!response.ok) {
         throw new Error("Failed to fetch items");
       }
 
       const json = await response.json();
-
       const items = arrayKey ? json[arrayKey] : json;
       if (!Array.isArray(items)) throw new Error("Data is not an array");
-      // console.log("Fetched data:", items);
+
       setFetchState({
         items: items,
         loading: false,
@@ -144,26 +151,53 @@ const Iterator = ({
         gridTemplateColumns: `repeat(${itemsPerRow}, 1fr)`,
         gap: "1rem",
         padding: "1rem",
-        // border: "2px dashed #4a90e2",
-        // borderRadius: "4px",
-        // background: "rgba(74, 144, 226, 0.1)",
         position: "relative",
       }}
     >
-      {items.map((item, index) => (
-        <div key={index}>
-          {index === 0 ? (
-            <DropZone zone="iterator-item">
-              {/* Render child components with data binding */}
-            </DropZone>
-          ) : (
-            // Clone the children from the first item for other items
-            iteratorItems.map((componentData, compIndex) =>
-              renderComponent(componentData, index, compIndex)
-            )
-          )}
-        </div>
-      ))}
+      {items.map((item, index) => {
+        // Debug logging for each item
+        console.log(`Item ${index}:`, item);
+        console.log(`Slug field:`, slugField);
+        console.log(`Navigate path:`, navigatePath);
+        console.log(
+          `Item[${slugField}]:`,
+          item[slugField as keyof typeof item]
+        );
+
+        return (
+          <div key={index}>
+            {navigatePath && slugField ? (
+              <Link
+                href={`${navigatePath}/${item[slugField as keyof typeof item]}`}
+              >
+                {index === 0 ? (
+                  <DropZone zone={`iterator-item`}>
+                    {/* Render child components with data binding */}
+                  </DropZone>
+                ) : (
+                  // Clone the children from the first item for other items
+                  iteratorItems.map((componentData, compIndex) =>
+                    renderComponent(componentData, index, compIndex)
+                  )
+                )}
+              </Link>
+            ) : (
+              <>
+                {index === 0 ? (
+                  <DropZone zone="iterator-item">
+                    {/* Render child components with data binding */}
+                  </DropZone>
+                ) : (
+                  // Clone the children from the first item for other items
+                  iteratorItems.map((componentData, compIndex) =>
+                    renderComponent(componentData, index, compIndex)
+                  )
+                )}
+              </>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 };

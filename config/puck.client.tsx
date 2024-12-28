@@ -58,12 +58,22 @@ export const clientConfig: UserConfig = {
             { label: "4", value: 4 },
           ],
         },
+        navigatePath: {
+          type: "text" as const,
+          label: "Navigate Path",
+        },
+        slugField: {
+          type: "text" as const,
+          label: "Slug Field",
+        },
       },
       defaultProps: {
         id: "iterator",
         apiEndpoint: "/api/items",
         itemsPerRow: 3 as 1 | 2 | 3 | 4,
         items: [],
+        navigatePath: "/product-details",
+        slugField: "id",
       },
     },
   },

@@ -33,6 +33,8 @@ export type ComponentProps = {
     apiEndpoint: string;
     arrayKey?: string;
     itemsPerRow: 1 | 2 | 3 | 4;
+    navigatePath?: string;
+    slugField?: string;
     items: any[];
     children?: any[];
   };
@@ -149,11 +151,21 @@ export const components = {
           { label: "4", value: 4 },
         ],
       },
+      navigatePath: {
+        type: "text" as const,
+        label: "Navigation Path",
+      },
+      slugField: {
+        type: "text" as const,
+        label: "Slug Field",
+      },
     },
     defaultProps: {
       apiEndpoint: "/api/items",
       itemsPerRow: 3,
       arrayKey: "",
+      navigatePath: "",
+      slugField: "",
     },
   },
 };
