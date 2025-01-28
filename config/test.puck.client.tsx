@@ -7,7 +7,7 @@ import {
   ImageBlock,
   ButtonBlock,
   Iterator,
-} from "../components/blocks";
+} from "../puck/blocks";
 
 // Client config with render implementations
 export const clientConfig: UserConfig = {

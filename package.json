@@ -9,21 +9,40 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@hookform/resolvers": "^3.9.1",
     "@measured/puck": "^0.17.1",
+    "@mui/base": "^5.0.0-beta.68",
+    "@mui/material": "^6.3.0",
     "@plasmicapp/loader-nextjs": "^1.0.407",
+    "@tanstack/react-query": "^5.62.11",
+    "chart.js": "^4.4.7",
     "formidable": "^3.5.2",
+    "iconsax-react": "^0.0.8",
+    "jsonwebtoken": "^9.0.2",
+    "lodash": "^4.17.21",
     "next": "14.2.18",
+    "next-auth": "^4.24.11",
     "react": "^18",
+    "react-color": "^2.19.3",
     "react-dom": "^18",
-    "react-dropzone": "^14.3.5"
+    "react-dropzone": "^14.3.5",
+    "react-hook-form": "^7.54.2",
+    "react-loading-skeleton": "^3.5.0",
+    "yup": "^1.6.1",
+    "zustand": "^5.0.2"
   },
   "devDependencies": {
+    "@nx/eslint-plugin": "^20.3.0",
     "@types/formidable": "^3.4.5",
+    "@types/jsonwebtoken": "^9.0.7",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "eslint": "^8",
     "eslint-config-next": "14.2.18",
+    "tailwindcss": "^3.4.17",
     "typescript": "^5"
   }
 }

@@ -6,8 +6,8 @@ import {
   TextBlock,
   ImageBlock,
   ButtonBlock,
-} from "../components/blocks";
-import IteratorRenderer from "../components/blocks/IteratorRenderer";
+} from "../puck/blocks";
+import IteratorRenderer from "../puck/blocks/IteratorRenderer";
 import React from "react";
 
 // Add base URL constant
